@@ -23,6 +23,7 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.0" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.1" />
   </ItemGroup>
 
   <ItemGroup>
@@ -42,6 +43,8 @@
     <None Remove="DataModels\Request\Location\" />
     <None Remove="AutoMapper.Extensions.Microsoft.DependencyInjection" />
     <None Remove="ViewModels\Request\Auth\" />
+    <None Remove="Repositories\" />
+    <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -51,6 +54,7 @@
     <Folder Include="Utilities\" />
     <Folder Include="ViewModels\Request\Location\" />
     <Folder Include="ViewModels\Request\Auth\" />
+    <Folder Include="Repositories\" />
   </ItemGroup>
   <ItemGroup>
     <None Condition="'$(ExcludeConfigFilesFromBuildOutput)'!='true'" Update="Utilities\Places.txt">

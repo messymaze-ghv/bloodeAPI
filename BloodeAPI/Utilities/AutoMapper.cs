@@ -2,6 +2,7 @@
 using AutoMapper;
 using BloodeAPI.ViewModels.Request.Auth;
 using BloodeAPI.Models;
+using BloodeAPI.ViewModels.Response;
 
 namespace BloodeAPI.Utilities
 {
@@ -9,7 +10,8 @@ namespace BloodeAPI.Utilities
 	{
 		public AutoMapper()
 		{
-			CreateMap<SignupRequest, User>();
+			CreateMap<RegisterRequest, User>();
+			CreateMap<User, RegisterResponse>();
         }
     }
 }

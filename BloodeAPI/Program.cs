@@ -1,4 +1,9 @@
-﻿using BloodeAPI.Models;
+﻿using System.Text;
+using BloodeAPI.Interfaces;
+using BloodeAPI.Models;
+using BloodeAPI.Repositories;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -12,9 +17,24 @@ builder.Services.AddSwaggerGen();
 
 
 builder.Services.AddDbContext<BlooddonateContext>();
+builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
-
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+        .AddJwtBearer(options =>
+        {
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidateAudience = true,
+                ValidateLifetime = true,
+                ValidateIssuerSigningKey = true,
+                ValidIssuer = builder.Configuration["AppSettings:Issuer"],
+                ValidAudience = builder.Configuration["AppSettings:Audience"],
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["AppSettings:Token"]))
+            };
+        });
 
 var app = builder.Build();
 
@@ -34,6 +54,7 @@ app.UseStatusCodePages();
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

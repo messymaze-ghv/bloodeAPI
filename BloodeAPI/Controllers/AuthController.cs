@@ -11,64 +11,151 @@ using System.Web;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using BloodeAPI.ViewModels.Request.Auth;
+using Microsoft.IdentityModel.Tokens;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using BloodeAPI.ViewModels.Response;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace BloodeAPI.Controllers
 {
     [ApiController]
-    [Route("Auth")]
-    public class AuthController : Controller,IAuthentication
+    [Route("[controller]")]
+    public class AuthController : Controller
     {
-        private readonly ILogger<WeatherForecastController> logger;
-        private readonly BlooddonateContext dbCtx;
+        private readonly IAuthRepository _repository;
+        private readonly IConfiguration config;
         private readonly IMapper _mapper;
 
 
-        public AuthController(ILogger<WeatherForecastController> logger,BlooddonateContext ctx, IMapper mapper)
+        public AuthController(IAuthRepository repo,IConfiguration config, IMapper mapper)
         {
-            this.logger = logger;
+            this._repository = repo;
             this._mapper = mapper;
-            this.dbCtx = ctx;
+            this.config = config;
         }
 
-        [HttpPost("Login")]
-        public IActionResult Login([FromBody] LoginRequest request)
-        {
+        //[HttpPost("Login")]
+        //public IActionResult Login([FromBody] LoginRequest request)
+        //{
+        //    try
+        //    {
+        //        if (request.UserName != null && request.Password != null)
+        //        {
+        //            var username = request.UserName;
+        //            var password = request.Password.GenerateHashing();
+        //            var user = this.dbCtx.Users.Where(ind => (ind.Email == request.UserName || ind.PhoneNumber == request.UserName)).Single();
+        //            return Ok(user.Password == HashUtils.GenerateHashing(request.Password));
+
+        //        }
+        //        return new BadRequestResult();
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return (IActionResult)ex;
+        //    }
+        //}
+
+        //[HttpPost("Register")]
+        //public IActionResult Signup([FromBody] SignupRequest request)
+        //{
+        //    try
+        //    {
+        //        request.Password = HashUtils.GenerateHashing(request!.Password!);
+        //        var dbUser = this._mapper.Map<User>(request);
+        //        this.dbCtx.Users.Add(dbUser);
+        //        this.dbCtx.SaveChanges();
+        //        return Ok(true);
+        //    }
+        //    catch(Exception ex)
+        //    {
+        //        return BadRequest(ex.InnerException.Message);
+        //    }
+        //}
+
+
+        // POST: api/auth/register
+        [HttpPost("register")]
+        public async Task<IActionResult> Register([FromBody] RegisterRequest userDto)
+            {
             try
             {
-                if (request.UserName != null && request.Password != null)
-                {
-                    var username = request.UserName;
-                    var password = request.Password.GenerateHashing();
-                    var user = this.dbCtx.Users.Where(ind => (ind.Email == request.UserName || ind.PhoneNumber == request.UserName)).Single();
-                    return Ok(user.Password == HashUtils.GenerateHashing(request.Password));
 
+                if (!ModelState.IsValid)
+                {
+                    return BadRequest(ModelState);
                 }
-                return new BadRequestResult();
+
+                // Create the user
+                var user = _mapper.Map<User>(userDto);
+                var result = await _repository.CreateAsync(user);
+                if (result == null)
+                {
+                    return BadRequest("Username already exists.");
+                }
+
+                // Map the user data to a UserDto object and return it in the response body
+                var userToReturn = _mapper.Map<RegisterResponse>(result);
+                return Ok(userToReturn);
             }
             catch (Exception ex)
             {
-                return (IActionResult)ex;
+                return BadRequest(ex.InnerException!.Message);
             }
         }
 
-        [HttpPost("Register")]
-        public IActionResult Signup([FromBody] SignupRequest request)
+
+        // POST: api/auth/login
+        [HttpPost("login")]
+        public async Task<IActionResult> Login([FromBody] LoginRequest loginDto)
         {
-            try
+            // Validate the request body
+            if (!ModelState.IsValid)
             {
-                request.Password = HashUtils.GenerateHashing(request!.Password!);
-                var dbUser = this._mapper.Map<User>(request);
-                this.dbCtx.Users.Add(dbUser);
-                this.dbCtx.SaveChanges();
-                return Ok(true);
+                return BadRequest(ModelState);
             }
-            catch(Exception ex)
+
+            // Retrieve the user from the database
+            var user = await _repository.FindByUsernameAsync(loginDto.UserName!);
+            if (user == null)
             {
-                return BadRequest(ex.InnerException.Message);
+                return Unauthorized();
             }
+
+
+            // Check the password
+            if(!_repository.VerifyPassword(user,loginDto.Password))
+            {
+                return Unauthorized();
+            }
+
+            // Generate a JWT
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier , user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName)
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.config.GetSection("AppSettings:Token").Value!));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(1),
+                SigningCredentials = creds,
+                Issuer = this.config.GetSection("AppSettings:Issuer").Value,
+                Audience = this.config.GetSection("AppSettings:Audience").Value
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+
+            return Ok(new
+            {
+                token = tokenHandler.WriteToken(token),
+            });
         }
+
 
     }
 }
