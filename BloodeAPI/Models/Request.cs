@@ -21,6 +21,10 @@ public partial class Request
 
     public int State { get; set; }
 
+    public int BloodGroup { get; set; }
+
+    public virtual ICollection<RequestDonar> RequestDonars { get; } = new List<RequestDonar>();
+
     public virtual ICollection<RequestHistory> RequestHistories { get; } = new List<RequestHistory>();
 
     public virtual User User { get; set; } = null!;

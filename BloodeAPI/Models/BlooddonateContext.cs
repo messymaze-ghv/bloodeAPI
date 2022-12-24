@@ -19,6 +19,8 @@ public partial class BlooddonateContext : DbContext
 
     public virtual DbSet<Request> Requests { get; set; }
 
+    public virtual DbSet<RequestDonar> RequestDonars { get; set; }
+
     public virtual DbSet<RequestHistory> RequestHistories { get; set; }
 
     public virtual DbSet<User> Users { get; set; }
@@ -57,9 +59,27 @@ public partial class BlooddonateContext : DbContext
                 .HasConstraintName("FK_Request_Users");
         });
 
+        modelBuilder.Entity<RequestDonar>(entity =>
+        {
+            entity.Property(e => e.Id).ValueGeneratedNever();
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+
+            entity.HasOne(d => d.Request).WithMany(p => p.RequestDonars)
+                .HasForeignKey(d => d.RequestId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RequestDonars_Request");
+
+            entity.HasOne(d => d.User).WithMany(p => p.RequestDonars)
+                .HasForeignKey(d => d.UserId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_RequestDonars_Users");
+        });
+
         modelBuilder.Entity<RequestHistory>(entity =>
         {
             entity.ToTable("RequestHistory");
+
+            entity.Property(e => e.CreatedDate).HasColumnType("datetime");
 
             entity.HasOne(d => d.Request).WithMany(p => p.RequestHistories)
                 .HasForeignKey(d => d.RequestId)

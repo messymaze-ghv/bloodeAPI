@@ -9,7 +9,7 @@ public partial class RequestHistory
 
     public int? RequestId { get; set; }
 
-    public int CreatedDate { get; set; }
+    public DateTime CreatedDate { get; set; }
 
     public virtual Request? Request { get; set; }
 }

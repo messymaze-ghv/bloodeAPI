@@ -32,5 +32,7 @@ public partial class User
 
     public virtual ICollection<DeviceInfo> DeviceInfos { get; } = new List<DeviceInfo>();
 
+    public virtual ICollection<RequestDonar> RequestDonars { get; } = new List<RequestDonar>();
+
     public virtual ICollection<Request> Requests { get; } = new List<Request>();
 }

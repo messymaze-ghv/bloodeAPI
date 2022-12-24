@@ -15,9 +15,9 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 
-
 builder.Services.AddDbContext<BlooddonateContext>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
+builder.Services.AddScoped<IRequestRepository, RequestRepository>();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
@@ -51,7 +51,6 @@ else
     app.UseHsts();
 }
 app.UseStatusCodePages();
-
 app.UseHttpsRedirection();
 
 app.UseAuthentication();

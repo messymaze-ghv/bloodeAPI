@@ -5,7 +5,7 @@ namespace BloodeAPI.Utilities
     {            
         public static string Concatenate(this string s1, string s2)
         {
-            return s1 + s2;
+            return s1 + " " + s2;
         }
         public static string ToCamelCase(this string s1)
         {
