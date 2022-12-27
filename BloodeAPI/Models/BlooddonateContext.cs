@@ -49,9 +49,18 @@ public partial class BlooddonateContext : DbContext
         {
             entity.ToTable("Request");
 
+            entity.Property(e => e.City)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.CreatedDate).HasColumnType("datetime");
+            entity.Property(e => e.District)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.LastUpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.Location).HasMaxLength(50);
+            entity.Property(e => e.State)
+                .HasMaxLength(50)
+                .IsUnicode(false);
 
             entity.HasOne(d => d.User).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.UserId)
@@ -90,7 +99,15 @@ public partial class BlooddonateContext : DbContext
         {
             entity.ToTable(tb => tb.HasComment("All of the basic user info stores here"));
 
-            entity.Property(e => e.Address).HasMaxLength(50);
+            entity.Property(e => e.Address)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.City)
+                .HasMaxLength(50)
+                .IsUnicode(false);
+            entity.Property(e => e.District)
+                .HasMaxLength(50)
+                .IsUnicode(false);
             entity.Property(e => e.Dob)
                 .HasColumnType("datetime")
                 .HasColumnName("DOB");
@@ -101,6 +118,9 @@ public partial class BlooddonateContext : DbContext
             entity.Property(e => e.LastName).HasMaxLength(50);
             entity.Property(e => e.PhoneNumber)
                 .HasMaxLength(20)
+                .IsUnicode(false);
+            entity.Property(e => e.State)
+                .HasMaxLength(50)
                 .IsUnicode(false);
         });
 

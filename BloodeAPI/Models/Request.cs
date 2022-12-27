@@ -17,11 +17,13 @@ public partial class Request
 
     public string Location { get; set; } = null!;
 
-    public int City { get; set; }
+    public string City { get; set; } = null!;
 
-    public int State { get; set; }
+    public string State { get; set; } = null!;
 
     public int BloodGroup { get; set; }
+
+    public string? District { get; set; }
 
     public virtual ICollection<RequestDonar> RequestDonars { get; } = new List<RequestDonar>();
 

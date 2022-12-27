@@ -13,7 +13,7 @@ namespace BloodeAPI.Utilities
         }
         public static string GetStatesJsonFilePath()
         {
-            return "/Users/harshavardhangangineni/Documents/Projects/Visual Studio Projects/BloodeAPI/BloodeAPI/Utilities/Places.json"; ;
+            return "StaticFiles/Places.json"; ;
         }
     }
 }

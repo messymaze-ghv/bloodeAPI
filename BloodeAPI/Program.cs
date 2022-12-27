@@ -1,9 +1,12 @@
-﻿using System.Text;
+﻿using System.Reflection;
+using System.Text;
 using BloodeAPI.Interfaces;
 using BloodeAPI.Models;
 using BloodeAPI.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.FileProviders;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,7 +16,6 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-
 
 builder.Services.AddDbContext<BlooddonateContext>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
@@ -37,21 +39,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         });
 
 var app = builder.Build();
+;
 
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+//// Configure the HTTP request pipeline.
+//if (app.Environment.IsDevelopment())
+//{
+//}
+
+app.UseSwagger();
+
+// Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.),  
+// specifying the Swagger JSON endpoint.  
+app.UseSwaggerUI(c =>
 {
-    app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
-else
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-}
+    c.SwaggerEndpoint("v1/swagger.json", "  API V1");
+    c.RoutePrefix = "swagger";
+});
+app.UseDeveloperExceptionPage();
+
 app.UseStatusCodePages();
 app.UseHttpsRedirection();
+app.UseFileServer(new FileServerOptions
+{
+    FileProvider = new PhysicalFileProvider(
+                  Path.Combine(Directory.GetCurrentDirectory(), "StaticFiles")),
+    RequestPath = "/StaticFiles",
+    EnableDefaultFiles = true
+});
 
 app.UseAuthentication();
 app.UseAuthorization();

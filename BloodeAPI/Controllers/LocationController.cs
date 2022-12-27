@@ -20,7 +20,7 @@ namespace BloodeAPI.Controllers
     {
         private readonly List<IndianStates?>? Locations = JsonHelper.LoadJson<List<IndianStates?>>(StringUtils.GetStatesJsonFilePath());
 
-        [HttpGet("FetchCities")]
+        [HttpPost("FetchCities")]
         public List<string> GetCities([FromBody] CitiesRequest location)
         {
             var districts = Locations!.Where((arg) => arg!.Name == location.State).SelectMany(d => d!.DistrictList!).ToList();
@@ -35,7 +35,6 @@ namespace BloodeAPI.Controllers
             var districtNames =  districts!.Select(d => d!.Name).ToList();
             return districtNames;
         }
-
         [HttpGet("FetchStates")]
         public List<string?> GetStates()
         {

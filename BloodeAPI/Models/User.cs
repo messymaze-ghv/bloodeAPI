@@ -20,9 +20,11 @@ public partial class User
 
     public string? Address { get; set; }
 
-    public int State { get; set; }
+    public string State { get; set; } = null!;
 
-    public int City { get; set; }
+    public string District { get; set; } = null!;
+
+    public string City { get; set; } = null!;
 
     public string? PhoneNumber { get; set; }
 
