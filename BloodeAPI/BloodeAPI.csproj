@@ -46,6 +46,7 @@
     <None Remove="Repositories\" />
     <None Remove="Microsoft.AspNetCore.Authentication.JwtBearer" />
     <None Remove="StaticFiles\" />
+    <None Remove="ViewModels\Request\RequestDTO\" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Models\" />
@@ -57,6 +58,7 @@
     <Folder Include="ViewModels\Request\Auth\" />
     <Folder Include="Repositories\" />
     <Folder Include="StaticFiles\" />
+    <Folder Include="ViewModels\Request\RequestDTO\" />
   </ItemGroup>
   <ItemGroup>
     <None Condition="'$(ExcludeConfigFilesFromBuildOutput)'!='true'" Update="Utilities\Places.txt">

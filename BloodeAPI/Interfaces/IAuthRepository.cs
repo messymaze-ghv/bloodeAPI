@@ -8,7 +8,7 @@ namespace BloodeAPI.Interfaces
     public interface IAuthRepository
 	{
 		public Task<User> CreateAsync(User user);
-		public Task<User> FindByUsernameAsync(string username);
+		public Task<User?> FindByUsernameAsync(string username);
 		public bool VerifyPassword(User user, string password);
     }
 }

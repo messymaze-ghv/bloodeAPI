@@ -3,7 +3,7 @@ using AutoMapper;
 using BloodeAPI.ViewModels.Request.Auth;
 using BloodeAPI.Models;
 using BloodeAPI.ViewModels.Response;
-using BloodeAPI.ViewModels.Request;
+using BloodeAPI.ViewModels.Request.RequestDTO;
 
 namespace BloodeAPI.Utilities
 {

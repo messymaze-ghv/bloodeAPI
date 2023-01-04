@@ -5,10 +5,12 @@ using Newtonsoft.Json.Linq;
 using static System.Net.Mime.MediaTypeNames;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 namespace BloodeAPI.Utilities
 {
-	public class JwtTokenExtracter
+	public class JwtTokenHelper
 	{
         public string? GetUserId(string token)
         {
@@ -32,6 +34,31 @@ namespace BloodeAPI.Utilities
                 return null;
             }
         }
+        public static String createJwtToken(User user, string securityToken,string issuer, string audince )
+        {
+
+            // Generate a JWT
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier , user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName)
+            };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(securityToken));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(claims),
+                Expires = DateTime.Now.AddDays(60),
+                SigningCredentials = creds,
+                Issuer = issuer,
+                Audience = audince
+            };
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var returnToken = tokenHandler.WriteToken(token);
+            return returnToken;
+        }
+
     }
 
 }

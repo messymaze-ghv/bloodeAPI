@@ -5,11 +5,13 @@ namespace BloodeAPI.ViewModels.Response
 	{
 		public string? RecipientName { get; set; }
 		public int RequestId { get; set; }
-        public int BloodGroup { get; set; }
+        public String? BloodGroup { get; set; }
 		public string? Location { get; set; }
 		public int CreatedUserId { get; set; }
-		public bool isUserResponded { get; set; } = false;
-		public bool isCreatedByLoggedInUser { get; set; } = false;
-        public IDictionary<string, string?> respondersList = new Dictionary<string, string?>();
+		public DateTime PostedDate { get; set; }
+        public bool isUserResponded { get; set; } = false;
+		public bool isActive { get; set; } = false;
+        public bool isCreatedByLoggedInUser { get; set; } = false;
+        public int respondersCount { get; set; }
     }
 }

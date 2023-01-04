@@ -27,6 +27,11 @@ namespace BloodeAPI.Controllers
     {
         private readonly IAuthRepository _repository;
         private readonly IConfiguration config;
+
+        public string Issuer { get; }
+        public string Audience { get; }
+        public string Token { get; }
+
         private readonly IMapper _mapper;
 
 
@@ -35,6 +40,9 @@ namespace BloodeAPI.Controllers
             this._repository = repo;
             this._mapper = mapper;
             this.config = config;
+            Issuer = this.config.GetSection("AppSettings:Issuer").Value!;
+            Audience = this.config.GetSection("AppSettings:Audience").Value!;
+            Token = this.config.GetSection("AppSettings:Token").Value!;
         }
 
         //[HttpPost("Login")]
@@ -77,6 +85,7 @@ namespace BloodeAPI.Controllers
 
 
         // POST: api/auth/register
+        //[ApiExplorerSettings(IgnoreApi = true)]
         [HttpPost("register")]
         public async Task<IActionResult> Register([FromBody] RegisterRequest userDto)
             {
@@ -88,6 +97,8 @@ namespace BloodeAPI.Controllers
                     return BadRequest(ModelState);
                 }
 
+
+
                 // Create the user
                 var user = _mapper.Map<User>(userDto);
                 var result = await _repository.CreateAsync(user);
@@ -95,10 +106,9 @@ namespace BloodeAPI.Controllers
                 {
                     return BadRequest("Username already exists.");
                 }
-
                 // Map the user data to a UserDto object and return it in the response body
-                var userToReturn = _mapper.Map<RegisterResponse>(result);
-                return Ok(userToReturn);
+                var token = JwtTokenHelper.createJwtToken(user, Token, Issuer, Audience);
+                return Ok(token);
             }
             catch (Exception ex)
             {
@@ -117,43 +127,23 @@ namespace BloodeAPI.Controllers
                 return BadRequest(ModelState);
             }
 
+
             // Retrieve the user from the database
             var user = await _repository.FindByUsernameAsync(loginDto.UserName!);
             if (user == null)
             {
                 return Unauthorized();
             }
-
-
+         
             // Check the password
-            if(!_repository.VerifyPassword(user,loginDto.Password))
+            if (!_repository.VerifyPassword(user,loginDto.Password!))
             {
                 return Unauthorized();
             }
 
-            // Generate a JWT
-            var claims = new[]
-            {
-                new Claim(ClaimTypes.NameIdentifier , user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.FirstName + " " + user.LastName)
-            };
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(this.config.GetSection("AppSettings:Token").Value!));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha512Signature);
-            var tokenDescriptor = new SecurityTokenDescriptor
-            {
-                Subject = new ClaimsIdentity(claims),
-                Expires = DateTime.Now.AddDays(1),
-                SigningCredentials = creds,
-                Issuer = this.config.GetSection("AppSettings:Issuer").Value,
-                Audience = this.config.GetSection("AppSettings:Audience").Value
-            };
-            var tokenHandler = new JwtSecurityTokenHandler();
-            var token = tokenHandler.CreateToken(tokenDescriptor);
+            var token = JwtTokenHelper.createJwtToken(user, Token, Issuer, Audience);
 
-            return Ok(new
-            {
-                token = tokenHandler.WriteToken(token),
-            });
+            return Ok(token);
         }
 
 

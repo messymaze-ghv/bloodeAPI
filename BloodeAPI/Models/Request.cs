@@ -21,9 +21,9 @@ public partial class Request
 
     public string State { get; set; } = null!;
 
-    public int BloodGroup { get; set; }
+    public string BloodGroup { get; set; } = null!;
 
-    public string? District { get; set; }
+    public string District { get; set; } = null!;
 
     public virtual ICollection<RequestDonar> RequestDonars { get; } = new List<RequestDonar>();
 

@@ -26,7 +26,7 @@ namespace BloodeAPI.ViewModels.Response
                     _lastName = char.ToUpper(value.First()) + value[1..].ToLower(); ;
             }
         }
-        public int Gender { get; set; }
+        public String? Gender { get; set; }
 
         public DateTime Dob
         {
@@ -37,15 +37,15 @@ namespace BloodeAPI.ViewModels.Response
             }
         }
 
-        public string? Address { get; set; }
+        public String State { get; set; }
 
-        public int State { get; set; }
+        public String City { get; set; }
 
-        public int City { get; set; }
+        public String District { get; set; }
 
         public string? PhoneNumber { get; set; }
 
-        public string? Email { get; set; }
+        public string? BloodGroup { get; set; }
 
         public int Id { get; set; }
     }

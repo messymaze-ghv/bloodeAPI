@@ -23,9 +23,9 @@ namespace BloodeAPI.Repositories
             return user;
         }
 
-        public async Task<User> FindByUsernameAsync(string username)
+        public async Task<User?> FindByUsernameAsync(string username)
         {
-            return  (await _context.Users.FirstOrDefaultAsync((u) => u.PhoneNumber == username || u.Email == username));
+            return  (await _context.Users.FirstOrDefaultAsync((u) => u.PhoneNumber == username));
         }
 
         public bool VerifyPassword(User user,string password)
